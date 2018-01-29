@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <time.h>
 #include <sys/types.h>
 
 char *FILE_STORAGE;
@@ -27,20 +26,18 @@ typedef struct wri {
 READERS setupReader(int id) {
 	
 	READERS r;
-	srand(time(NULL));
 	r.id = id;
 	r.read_count = 0;
-	r.wait_time = rand();
+	r.wait_time = 1 + rand() % 1000;
 	return r;
 	
 }
 
-WRITERS *setupWriter(int id) {
+WRITERS setupWriter(int id) {
 	
-	WRITERS *w = malloc(sizeof(WRITERS));
-	srand(time(NULL));
-	w->id = id;
-	w->wait_time = rand();
+	WRITERS w;
+	w.id = id;
+	w.wait_time = 1 + rand() % 1000;
 	return w;
 	
 }
@@ -66,21 +63,21 @@ void *readFromFile(void *p) {
 	
 	while(readc < MAX_READ_COUNT) {
 		
-		//pthread_mutex_trylock(&mutex1);
+		usleep(wait);
+		pthread_mutex_trylock(&mutex1);
 		printf("R%d has read:\t%s\n", id, FILE_STORAGE);
 		readc++;
-		//pthread_mutex_unlock(&mutex1);
+		pthread_mutex_unlock(&mutex1);
 		
 	}
+	printf("R%d done reading\n", id);
 	
 }
-/*
+
 void *writeToFile(void *p) {
 	
-	//get lock
-	//write to file
-	//release lock
-	//return string
+	pthread_mutex_trylock(&mutex1);
+	
+	pthread_mutex_unlock(&mutex1);
 	
 }
-*/

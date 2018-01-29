@@ -42,11 +42,20 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	
+	srand(time(NULL));
 	for (int i = 0; i < n; i++) {
 		
-		rtmp = &readers[i];
 		readers[i] = setupReader(i);
+		rtmp = &readers[i];
 		pthread_create(&rp[i], NULL, readFromFile, (void *)rtmp);
+		
+	}
+	
+	for (int j = 0; j < m; j++) {
+		
+		writers[i] = setupWriter(i);
+		wtmp = &writers[i];
+		pthread_create(&wp[i], NULL, writeToFile, (void *)wtmp);
 		
 	}
 	
