@@ -1,8 +1,8 @@
 all: rAndW
-	gcc readersAndWriters.o -o readersAndWriters
+	gcc -pthread readersAndWriters.o -o readersAndWriters
 
-rAndW: readersAndWriters.c
-	gcc -c readersAndWriters.c -o readersAndWriters.o
+rAndW: readersAndWriters.c readersAndWriters.h
+	gcc -pthread -c readersAndWriters.c -o readersAndWriters.o
 
 clean:
 	rm readersAndWriters
