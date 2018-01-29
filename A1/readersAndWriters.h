@@ -4,7 +4,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-char *FILE_STORAGE;
+char FILE_STORAGE[10];//used to modify the file
+int FILE_LENGTH;
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 int MAX_READ_COUNT = 10;
 
@@ -42,15 +43,15 @@ WRITERS setupWriter(int id) {
 	
 }
 
-char *setupFile(int n) {
+void setupFile(int n) {
 	
 	int i;
-	char *f = malloc(sizeof(char)*n+1);
+	FILE_LENGTH = n;
 	for (i = 0; i < n; i++) {
-		f = strcat(f, "0");
+		FILE_STORAGE[i] = '0';
+		printf("FILE: %s\n", FILE_STORAGE);
 	}
 	
-	return f;
 	
 }
 
@@ -60,14 +61,21 @@ void *readFromFile(void *p) {
 	READERS *r = (READERS *)p;
 	int id = r->id;
 	int wait = r->wait_time;
+	int ERROR;
 	
 	while(readc < MAX_READ_COUNT) {
 		
 		usleep(wait);
-		pthread_mutex_trylock(&mutex1);
-		printf("R%d has read:\t%s\n", id, FILE_STORAGE);
-		readc++;
-		pthread_mutex_unlock(&mutex1);
+		ERROR = pthread_mutex_trylock(&mutex1);
+		if (ERROR == 0) {//lock is open
+			printf("R%d has read:\t", id);
+			for (int i = 0; i < FILE_LENGTH; i++) {
+				printf("%c", FILE_STORAGE[i]);
+			}
+			printf("\n");
+			readc++;
+			pthread_mutex_unlock(&mutex1);
+		}
 		
 	}
 	printf("R%d done reading\n", id);
@@ -76,8 +84,28 @@ void *readFromFile(void *p) {
 
 void *writeToFile(void *p) {
 	
-	pthread_mutex_trylock(&mutex1);
+	WRITERS *w = (WRITERS *)p;
+	int id = w->id;
+	int wait = w->wait_time;
+	int isDone = 0;
+	int ERROR;
+	char *tmp;
 	
-	pthread_mutex_unlock(&mutex1);
+	do {
+		
+		usleep(wait);
+		ERROR = pthread_mutex_trylock(&mutex1);
+		if (ERROR == 0) {//lock is open
+			FILE_STORAGE[id] = id + '0';
+			printf("W%d wrote:\t", id);
+			for (int i = 0; i < FILE_LENGTH; i++) {
+				printf("%c", FILE_STORAGE[i]);
+			}
+			printf("\n");
+			isDone = 1;
+			pthread_mutex_unlock(&mutex1);
+		}
+		
+	} while(!isDone);
 	
 }

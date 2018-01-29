@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 		printf("Insufficient memory\n");
 		exit(1);
 	}
-	FILE_STORAGE = setupFile(m);
+	setupFile(m);
 	rp = malloc(sizeof(pthread_t)*n);
 	wp = malloc(sizeof(pthread_t)*m);
 	arg = malloc(sizeof(int));
@@ -46,14 +46,24 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < n; i++) {
 		
 		readers[i] = setupReader(i);
+		
+	}
+	
+	for (i = 0; i < m; i++) {
+		
+		writers[i] = setupWriter(i);
+		
+	}
+	
+	for (i = 0; i < n; i++) {
+		
 		rtmp = &readers[i];
 		pthread_create(&rp[i], NULL, readFromFile, (void *)rtmp);
 		
 	}
 	
-	for (int j = 0; j < m; j++) {
+	for (i = 0; i < m; i++) {
 		
-		writers[i] = setupWriter(i);
 		wtmp = &writers[i];
 		pthread_create(&wp[i], NULL, writeToFile, (void *)wtmp);
 		
@@ -65,14 +75,19 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	//ret1 = pthread_create(&t1, NULL, printMsg, (void *)msg1);
-	//ret2 = pthread_create(&t2, NULL, printMsg, (void *)msg2);
+	for (int i = 0; i < m; i++) {
+		
+		pthread_join(wp[i], NULL);
+		
+	}
 	
-	//printf("%d and %d\n", ret1, ret2);
-	
-	//pthread_join(t1, NULL);
-	//pthread_join(t2, NULL);
-	
+	/*free(readers);
+	free(writers);
+	free(rp);
+	free(wp);
+	free(rtmp);
+	free(wtmp);
+	*/
 	return 0;
 	
 }
