@@ -7,7 +7,7 @@
 char FILE_STORAGE[10];//used to modify the file
 int FILE_LENGTH;
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-int MAX_READ_COUNT = 10;
+int MAX_READ_COUNT = 5;
 
 typedef struct rea {
 	
@@ -49,7 +49,6 @@ void setupFile(int n) {
 	FILE_LENGTH = n;
 	for (i = 0; i < n; i++) {
 		FILE_STORAGE[i] = '0';
-		printf("FILE: %s\n", FILE_STORAGE);
 	}
 	
 	

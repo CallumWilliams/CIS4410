@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
 	
 	readers = malloc(sizeof(READERS)*n);
 	writers = malloc(sizeof(WRITERS)*m);
-	rtmp = malloc(sizeof(READERS)*n);
-	wtmp = malloc(sizeof(WRITERS)*m);
+	rtmp = malloc(sizeof(READERS));
+	wtmp = malloc(sizeof(WRITERS));
 	
 	if (!readers || !writers || !rtmp || !wtmp) {
 		printf("Insufficient memory\n");
@@ -69,25 +69,18 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	for (int i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		
 		pthread_join(rp[i], NULL);
 		
 	}
 	
-	for (int i = 0; i < m; i++) {
+	for (i = 0; i < m; i++) {
 		
 		pthread_join(wp[i], NULL);
 		
 	}
 	
-	/*free(readers);
-	free(writers);
-	free(rp);
-	free(wp);
-	free(rtmp);
-	free(wtmp);
-	*/
 	return 0;
 	
 }
