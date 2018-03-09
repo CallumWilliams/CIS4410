@@ -194,6 +194,7 @@ void startServer(int g) {
 	struct sockaddr_storage serverStorage;
 	socklen_t addr_size;
 	int i;
+	int readerCount = 0;
 	
 	pid_t child;
 	int status;
@@ -329,6 +330,8 @@ void startServer(int g) {
 					CONNECTION c = searchForConnection(tmp);
 					removeConnection(tmp);
 					printf("%s closing %d\n", buff_in, c.socketID);
+					if (t == 'R') readerCount--;
+					if (readerCount == 0) s[gr].busy = 0;//open up busy queue
 					close(c.socketID);
 					close(newSocket);//also close current connection
 				}
@@ -339,11 +342,30 @@ void startServer(int g) {
 			 *busy and have something to do in the queue*/
 			for (int i = 0; i < g; i++) {
 				
-				if (s[i].busy == 0 && s[i].q.element_count > 0) {
+				if (s[i].busy == 2 && s[i].q.element[0].type == 'R') {
+					
+					readerCount++;
+					printf("New readers %d\n", readerCount);
+					REQUEST pop = getFirstElement(s[i].q);
+					s[i].q = removeFrontElement(s[i].q);
+					sprintf(buff_out, "ACCEPT %d %c %d", pop.group, pop.type, pop.id);
+					buff_out[strlen(buff_out)] = '\0';
+					//find the socket in the list of stored ones
+					CONNECTION c = searchForConnection(pop);
+					send(c.socketID, buff_out, strlen(buff_out) + 1, 0);
+					printf("Replying to connection %d with %s\n", c.socketID, buff_out);
+					
+				//if queue isn't busy, an element is in the queue, and there are no active readers
+				} else if (s[i].busy == 0 && s[i].q.element_count > 0 && readerCount == 0) {
 					
 					s[i].busy = 1;
 					REQUEST pop = getFirstElement(s[i].q);
 					s[i].q = removeFrontElement(s[i].q);
+					//
+					if (pop.type == 'R') {
+						readerCount++;
+						s[i].busy = 2;//set with reader flag
+					}
 					sprintf(buff_out, "ACCEPT %d %c %d", pop.group, pop.type, pop.id);
 					buff_out[strlen(buff_out)] = '\0';
 					//find the socket in the list of stored ones
