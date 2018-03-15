@@ -1,16 +1,16 @@
 all: client server
 
 run_client:
-	java client
+	java Client
 
 run_server: 
-	java server
+	java Server
 
 client:
-	javac client.java
+	javac Client.java
 
 server:
-	echo not made
+	javac Server.java
 
 clean: 
 	rm *.class
