@@ -1,9 +1,11 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Server {
 	
+	private ArrayList<ServerUser> users = new ArrayList<ServerUser> ();
 	private ServerSocket serv;
 	private Socket sock;
 	private DataInputStream input;
@@ -21,7 +23,8 @@ public class Server {
 				sock = serv.accept();
 				input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
 				output = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
-				System.out.println(sock + " connected.");
+				System.out.println(sock.getPort());
+				readData();
 				
 			}
 			
@@ -35,8 +38,20 @@ public class Server {
 		
 		try {
 			
-			input.readUTF();
-			//process
+			String in = input.readUTF();
+			StringTokenizer tok = new StringTokenizer(in, "|");
+			
+			String type = tok.nextToken();
+			if (type.equals("CONNECTED")) {
+				
+				//create user
+				String usr = tok.nextToken();
+				users.add(new ServerUser(usr, sock.getPort()));
+				writeData(usr + " has connected.");
+				
+			} else {
+				System.out.println(type);
+			}
 			
 		} catch (Exception e) {
 			System.out.println("Exception caught when reading: " + e);
@@ -47,6 +62,7 @@ public class Server {
 	public void writeData(String msg) {
 		
 		try {
+			
 			
 			output.writeUTF(msg);
 			output.flush();

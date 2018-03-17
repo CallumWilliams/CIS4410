@@ -6,18 +6,20 @@ import java.awt.event.*;
 import java.net.*;
 import java.io.*;
 
-public class Client extends JFrame {
+public class Client extends JFrame implements Runnable {
     
 	//information variables
 	private static String HOST;
 	private static Integer PORT;
 	private static String USER;
 	private static Client c;
+	private static Thread readThread;
 	
 	//network variables
 	private Socket sock;
 	private DataInputStream input;
 	private DataOutputStream output;
+	private static Boolean active;
 	
 	//GUI variables
 	private static JLabel logs_label = new JLabel("Chat Logs");
@@ -36,6 +38,10 @@ public class Client extends JFrame {
 			sock = new Socket(h, p);
 			input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
 			output = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
+			active = true;
+			sendData("CONNECTED|" + u);
+			readThread = new Thread(this);
+			readThread.start();
 			
 		} catch (Exception e) {
 			System.out.println("Exception caught: " + e);
@@ -43,15 +49,21 @@ public class Client extends JFrame {
 		
 	}
 	
-	public void readData() {
+	/**main reading thread**/
+	public void run() {
 		
-		try {
+		while (active) {
 			
-			input.readUTF();
-			//process
+			try {
+				
+				String in = input.readUTF();
+				System.out.println(in);
+				chatLogs_field.append(in + "\n");
+				
+			} catch (Exception e) {
+				System.out.println("Exception caught when reading : " + e);
+			}
 			
-		} catch (Exception e) {
-			System.out.println("Exception caught when reading: " + e);
 		}
 		
 	}
@@ -126,7 +138,7 @@ public class Client extends JFrame {
             
             public void actionPerformed(ActionEvent e) {
                 System.out.println("disconnect");
-                //disconnect
+                active = false;
                 connect_button.setEnabled(true); disconnect_button.setEnabled(false);
             }
             
