@@ -36,25 +36,37 @@ public class Server {
 	
 	public void readData() {
 		
-		try {
+		while(true) {
 			
-			String in = input.readUTF();
-			StringTokenizer tok = new StringTokenizer(in, "|");
-			
-			String type = tok.nextToken();
-			if (type.equals("CONNECTED")) {
+			try {
 				
-				//create user
-				String usr = tok.nextToken();
-				users.add(new ServerUser(usr, sock.getPort()));
-				writeData(usr + " has connected.");
+				String in = input.readUTF();
+				StringTokenizer tok = new StringTokenizer(in, "|");
 				
-			} else {
-				System.out.println(type);
+				String type = tok.nextToken();
+				System.out.println(in);
+				if (type.equals("CONNECTED")) {
+					
+					//create user
+					String usr = tok.nextToken();
+					users.add(new ServerUser(usr, sock.getPort()));
+					writeData(usr + " has connected.");
+					
+				} else if (type.equals("SEND")) {
+					
+					ServerUser s = findUser(sock.getPort());
+					writeData(s.getUsername() + ": " + tok.nextToken());
+					
+				} else {
+					System.out.println(type);
+				}
+				
+			} catch (Exception e) {
+				System.out.println("Exception caught when reading: " + e);
+				System.out.println("Shutting down.");//extreme measure. Temporary.
+				System.exit(0);
 			}
 			
-		} catch (Exception e) {
-			System.out.println("Exception caught when reading: " + e);
 		}
 		
 	}
@@ -63,13 +75,27 @@ public class Server {
 		
 		try {
 			
-			
 			output.writeUTF(msg);
 			output.flush();
 			
 		} catch (Exception e) {
 			System.out.println("Exception caught when sending '" + msg + "': " + e);
 		}
+		
+	}
+	
+	public ServerUser findUser(int p) {
+		
+		for (int i = 0; i < users.size(); i++) {
+			
+			ServerUser s = users.get(i);
+			if (s.getPort() == p) {
+				return s;
+			}
+			
+		}
+		
+		return null;
 		
 	}
 	

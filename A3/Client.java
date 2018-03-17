@@ -29,6 +29,7 @@ public class Client extends JFrame implements Runnable {
 	private static JButton connect_button = new JButton("Connect");
 	private static JButton disconnect_button = new JButton("Disconnect");
 	private static JTextField sendMessage_field = new JTextField();
+	private static JButton sendMsg_button = new JButton("Send");
 	
 	/**Sets up client**/
 	public Client(String u, String h, Integer p) {
@@ -72,6 +73,7 @@ public class Client extends JFrame implements Runnable {
 		
 		try {
 			
+			System.out.println(msg);
 			output.writeUTF(msg);
 			output.flush();
 			
@@ -104,6 +106,7 @@ public class Client extends JFrame implements Runnable {
 		content.add(username_label);
 		
 		username_field.setPreferredSize(new Dimension(150, 20));
+		username_field.setText("");
 		content.add(username_field);
 		
 		connect_button.addActionListener(new ActionListener() {
@@ -117,7 +120,9 @@ public class Client extends JFrame implements Runnable {
                 		
                 		USER = username;
                 		c = new Client(USER, HOST, PORT);
-                		connect_button.setEnabled(false); disconnect_button.setEnabled(true);
+                		connect_button.setEnabled(false);
+                		disconnect_button.setEnabled(true);
+                		sendMsg_button.setEnabled(true);
                 		
                 	} catch (Exception ex) {
                 		
@@ -137,16 +142,39 @@ public class Client extends JFrame implements Runnable {
         disconnect_button.addActionListener(new ActionListener() {
             
             public void actionPerformed(ActionEvent e) {
+            	
                 System.out.println("disconnect");
                 active = false;
-                connect_button.setEnabled(true); disconnect_button.setEnabled(false);
+                connect_button.setEnabled(true);
+                disconnect_button.setEnabled(false);
+                sendMsg_button.setEnabled(false);
+                
             }
             
         });
         content.add(disconnect_button);
         
-        sendMessage_field.setPreferredSize(new Dimension(250, 20));
+        sendMessage_field.setPreferredSize(new Dimension(200, 20));
         content.add(sendMessage_field);
+        
+        sendMsg_button.setEnabled(false);
+        sendMsg_button.setText("");
+        sendMsg_button.addActionListener(new ActionListener() {
+        	
+        	public void actionPerformed(ActionEvent e) {
+        		
+        		String toSend = sendMessage_field.getText();
+        		sendMessage_field.setText("");
+        		if (toSend != "") {
+        			
+        			c.sendData("SEND|" + toSend);
+        			
+        		}
+        		
+        	}
+        	
+        });
+        content.add(sendMsg_button);
         
         /**Put constraints**/
         sl.putConstraint(SpringLayout.NORTH, chatLogs_field, 10, SpringLayout.SOUTH, logs_label);
@@ -159,6 +187,8 @@ public class Client extends JFrame implements Runnable {
         sl.putConstraint(SpringLayout.NORTH, disconnect_button, 10, SpringLayout.SOUTH, username_field);
         sl.putConstraint(SpringLayout.WEST, disconnect_button, 10, SpringLayout.EAST, connect_button);
         sl.putConstraint(SpringLayout.NORTH, sendMessage_field, 5, SpringLayout.SOUTH, chatLogs_field);
+        sl.putConstraint(SpringLayout.NORTH, sendMsg_button, 10, SpringLayout.SOUTH, chatLogs_field);
+        sl.putConstraint(SpringLayout.WEST, sendMsg_button, 5, SpringLayout.EAST, sendMessage_field);
         
         /**Display**/
         frame.setVisible(true);
