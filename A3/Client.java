@@ -71,6 +71,7 @@ public class Client extends JFrame implements Runnable {
 		
 	}
 	
+	/**Sends data to server**/
 	public void sendData(String msg) {
 		
 		try {
@@ -84,6 +85,7 @@ public class Client extends JFrame implements Runnable {
 		
 	}
 	
+	/**Stops the client networking from running**/
 	public void stop() {
 		
 		if (readThread != null) {
@@ -100,6 +102,7 @@ public class Client extends JFrame implements Runnable {
 		
 	}
 	
+	/**Loads GUI**/
 	private static void loadInterface() {
 		
 		/**Setup window**/

@@ -3,13 +3,13 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class Server {
+public class Server implements Runnable {
 	
 	private ArrayList<ServerUser> users = new ArrayList<ServerUser> ();
+	private Thread thread;
 	private ServerSocket serv;
 	private Socket sock;
 	private DataInputStream input;
-	private DataOutputStream output;
 	
 	public Server(int port) {
 		
@@ -18,10 +18,17 @@ public class Server {
 			serv = new ServerSocket(port);
 			System.out.println("Server started.");
 			
-			sock = serv.accept();
-			input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
-			output = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
-			readData();
+			while (true) {
+				
+				sock = serv.accept();
+				System.out.println(sock);
+				users.add(new ServerUser(sock));
+				System.out.println("added " + sock.getPort() + " now at " + users.size());
+				input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
+				thread = new Thread(this);
+				thread.start();
+				
+			}
 			
 		} catch (Exception e) {
 			System.out.println("Exception caught: " + e);
@@ -29,9 +36,10 @@ public class Server {
 		
 	}
 	
-	public void readData() {
+	/**Main listening method**/
+	public void run () {
 		
-		while(true) {
+		while (true) {
 			
 			try {
 				
@@ -44,8 +52,13 @@ public class Server {
 					
 					//create user
 					String usr = tok.nextToken();
-					users.add(new ServerUser(usr, sock));
-					writeData(usr + " has connected.");
+					int loc = findUser(sock.getPort());
+					if (loc == -1) {
+						System.out.println(sock.getPort() + " not found in list.");
+					} else {
+						users.get(loc).setUsername(usr);
+						writeData(usr + " has connected.");
+					}
 					
 				} else if (type.equals("DISCONNECTED")) {
 					
@@ -54,8 +67,8 @@ public class Server {
 					ServerUser s = users.get(loc);
 					
 					//remove user
-					users.remove(loc);
 					writeData(s.getUsername() + " has disconnected.");
+					users.remove(loc);
 					
 				} else if (type.equals("SEND")) {
 					
@@ -79,22 +92,21 @@ public class Server {
 	
 	public void writeData(String msg) {
 		
-		try {
+		/**Calls all existing users' writeData() methods**/
+		for (int i = 0; i < users.size(); i++) {
 			
-			output.writeUTF(msg);
-			output.flush();
+			users.get(i).writeData(msg);
 			
-		} catch (Exception e) {
-			System.out.println("Exception caught when sending '" + msg + "': " + e);
 		}
-		
 	}
 	
+	/**Search through connected users and find the one on port p**/
 	public int findUser(int p) {
 		
 		for (int i = 0; i < users.size(); i++) {
 			
 			ServerUser s = users.get(i);
+			System.out.println(s.getPort() + " vs " + p);
 			if (s.getPort() == p) {
 				return i;
 			}
