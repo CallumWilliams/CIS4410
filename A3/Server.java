@@ -18,15 +18,10 @@ public class Server {
 			serv = new ServerSocket(port);
 			System.out.println("Server started.");
 			
-			while (true) {
-				
-				sock = serv.accept();
-				input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
-				output = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
-				System.out.println(sock.getPort());
-				readData();
-				
-			}
+			sock = serv.accept();
+			input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
+			output = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
+			readData();
 			
 		} catch (Exception e) {
 			System.out.println("Exception caught: " + e);
@@ -41,24 +36,35 @@ public class Server {
 			try {
 				
 				String in = input.readUTF();
-				StringTokenizer tok = new StringTokenizer(in, "|");
-				
-				String type = tok.nextToken();
 				System.out.println(in);
+				StringTokenizer tok = new StringTokenizer(in, "|");
+				String type = tok.nextToken();
+				
 				if (type.equals("CONNECTED")) {
 					
 					//create user
 					String usr = tok.nextToken();
-					users.add(new ServerUser(usr, sock.getPort()));
+					users.add(new ServerUser(usr, sock));
 					writeData(usr + " has connected.");
+					
+				} else if (type.equals("DISCONNECTED")) {
+					
+					//find user
+					int loc = findUser(sock.getPort());
+					ServerUser s = users.get(loc);
+					
+					//remove user
+					users.remove(loc);
+					writeData(s.getUsername() + " has disconnected.");
 					
 				} else if (type.equals("SEND")) {
 					
-					ServerUser s = findUser(sock.getPort());
+					int loc = findUser(sock.getPort());
+					ServerUser s = users.get(loc);
 					writeData(s.getUsername() + ": " + tok.nextToken());
 					
 				} else {
-					System.out.println(type);
+					System.out.println("Error " + type);
 				}
 				
 			} catch (Exception e) {
@@ -84,18 +90,18 @@ public class Server {
 		
 	}
 	
-	public ServerUser findUser(int p) {
+	public int findUser(int p) {
 		
 		for (int i = 0; i < users.size(); i++) {
 			
 			ServerUser s = users.get(i);
 			if (s.getPort() == p) {
-				return s;
+				return i;
 			}
 			
 		}
 		
-		return null;
+		return -1;
 		
 	}
 	

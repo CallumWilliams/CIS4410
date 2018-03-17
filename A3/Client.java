@@ -58,11 +58,13 @@ public class Client extends JFrame implements Runnable {
 			try {
 				
 				String in = input.readUTF();
-				System.out.println(in);
+				if (in.equals(USER + " has disconnected.")) {
+					System.out.println("Close");
+				}
 				chatLogs_field.append(in + "\n");
 				
 			} catch (Exception e) {
-				System.out.println("Exception caught when reading : " + e);
+				System.out.println("Exception caught when reading: " + e);
 			}
 			
 		}
@@ -73,7 +75,6 @@ public class Client extends JFrame implements Runnable {
 		
 		try {
 			
-			System.out.println(msg);
 			output.writeUTF(msg);
 			output.flush();
 			
@@ -83,13 +84,39 @@ public class Client extends JFrame implements Runnable {
 		
 	}
 	
+	public void stop() {
+		
+		if (readThread != null) {
+			readThread.interrupt();
+			readThread = null;
+		}
+		try {
+			if (input != null) input.close();
+			if (output != null) output.close();
+			if (sock != null) sock.close();
+		} catch (Exception e) {
+			
+		}
+		
+	}
+	
 	private static void loadInterface() {
 		
 		/**Setup window**/
-    	
 		JFrame frame = new JFrame("Chat Program");
 		frame.setSize(500, 450);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			
+			public void windowClosing(WindowEvent e) {
+				
+				if (c != null) {
+					c.sendData("DISCONNECTED|" + USER);
+				}
+				System.exit(0);
+				
+			}
+			
+		});
 		
 		/**Setup content pane**/
 		Container content = frame.getContentPane();
@@ -112,7 +139,10 @@ public class Client extends JFrame implements Runnable {
 		connect_button.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
+				
 				String username = username_field.getText();
+				username_field.setText("");
+				
 				if (username != "" && username != null) {
 					
 					/**establish connection for username**/
@@ -143,11 +173,11 @@ public class Client extends JFrame implements Runnable {
             
             public void actionPerformed(ActionEvent e) {
             	
-                System.out.println("disconnect");
                 active = false;
                 connect_button.setEnabled(true);
                 disconnect_button.setEnabled(false);
                 sendMsg_button.setEnabled(false);
+                c.sendData("DISCONNECTED|" + USER);
                 
             }
             
@@ -155,10 +185,11 @@ public class Client extends JFrame implements Runnable {
         content.add(disconnect_button);
         
         sendMessage_field.setPreferredSize(new Dimension(200, 20));
+        sendMessage_field.setText("");
         content.add(sendMessage_field);
         
+        sendMsg_button.setPreferredSize(new Dimension(75, 30));
         sendMsg_button.setEnabled(false);
-        sendMsg_button.setText("");
         sendMsg_button.addActionListener(new ActionListener() {
         	
         	public void actionPerformed(ActionEvent e) {
