@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 
-public class ServerUser {
+public class ServerUser extends Thread {
 	
 	private String username;
 	private Socket sock;
@@ -9,10 +9,10 @@ public class ServerUser {
 	private DataInputStream input;
 	private DataOutputStream output;
 	
-	public ServerUser(Socket s) {
+	public ServerUser(Socket so) {
 		
 		this.username = null;
-		this.sock = s;
+		this.sock = so;
 		this.port = sock.getPort();
 		try {
 			input = new DataInputStream(new BufferedInputStream(sock.getInputStream()));

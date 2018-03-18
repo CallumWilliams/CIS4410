@@ -44,7 +44,7 @@ public class Server implements Runnable {
 			try {
 				
 				String in = input.readUTF();
-				System.out.println(in);
+				System.out.println(in + " received from " + sock.getPort());
 				StringTokenizer tok = new StringTokenizer(in, "|");
 				String type = tok.nextToken();
 				
@@ -54,7 +54,7 @@ public class Server implements Runnable {
 					String usr = tok.nextToken();
 					int loc = findUser(sock.getPort());
 					if (loc == -1) {
-						System.out.println(sock.getPort() + " not found in list.");
+						System.out.println(usr + " not found in list.");
 					} else {
 						users.get(loc).setUsername(usr);
 						writeData(usr + " has connected.");
@@ -72,9 +72,8 @@ public class Server implements Runnable {
 					
 				} else if (type.equals("SEND")) {
 					
-					int loc = findUser(sock.getPort());
-					ServerUser s = users.get(loc);
-					writeData(s.getUsername() + ": " + tok.nextToken());
+					String usr = tok.nextToken();
+					writeData(usr + ": " + tok.nextToken());
 					
 				} else {
 					System.out.println("Error " + type);
@@ -101,13 +100,12 @@ public class Server implements Runnable {
 	}
 	
 	/**Search through connected users and find the one on port p**/
-	public int findUser(int p) {
+	public int findUser(int port) {
 		
 		for (int i = 0; i < users.size(); i++) {
 			
 			ServerUser s = users.get(i);
-			System.out.println(s.getPort() + " vs " + p);
-			if (s.getPort() == p) {
+			if (s.getPort() == port) {
 				return i;
 			}
 			

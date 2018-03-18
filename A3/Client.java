@@ -51,7 +51,7 @@ public class Client extends JFrame implements Runnable {
 	}
 	
 	/**main reading thread**/
-	public void run() {
+	public void run () {
 		
 		while (active) {
 			
@@ -201,7 +201,8 @@ public class Client extends JFrame implements Runnable {
         		sendMessage_field.setText("");
         		if (toSend != "") {
         			
-        			c.sendData("SEND|" + toSend);
+        			System.out.println("SENDING DATA " + toSend);
+        			c.sendData("SEND|" + USER + "|" + toSend);
         			
         		}
         		
