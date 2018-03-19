@@ -28,7 +28,6 @@ public class ServerUser extends Thread {
 		
 		try {
 			
-			System.out.println(msg);
 			output.writeUTF(msg);
 			output.flush();
 			
@@ -45,6 +44,10 @@ public class ServerUser extends Thread {
 	
 	public String getUsername() {
 		return this.username;
+	}
+	
+	public void setSocket(Socket s) {
+		
 	}
 	
 	public void setPort(int p) {
