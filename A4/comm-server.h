@@ -26,6 +26,8 @@ void initializeNetwork(int p) {
 
 void serv_register(char *process_name) {
 	
+	REGISTERED_FLAG = 1;
+	strcpy(client_username, process_name);
 	sprintf(buff, "REGISTER %s", process_name);
 	sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 	printf("Sent %s\n", buff);
@@ -34,7 +36,12 @@ void serv_register(char *process_name) {
 
 void terminate(char *process_name) {
 	
-	
+	if (REGISTERED_FLAG) {
+		REGISTERED_FLAG = 0;
+		memset(client_username, '\0', 50);
+	} else {
+		printf("No client registered.\n\n");
+	}
 	
 }
 

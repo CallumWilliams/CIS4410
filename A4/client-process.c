@@ -33,11 +33,16 @@ void main(int argc, char *argv[]) {
 			switch(opt) {
 				
 				case 1:
-					printf("Enter username > ");
-					fgets(input, 512, stdin);
-					serv_register(input);
+					if (REGISTERED_FLAG) {
+						printf("Account already registered - please terminate to create new profile\n\n");
+					} else {
+						printf("Enter username > ");
+						fgets(input, 512, stdin);
+						serv_register(input);
+					}
 					break;
 				case 2:
+					terminate(client_username);
 					break;
 				case 3:
 					break;

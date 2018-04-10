@@ -23,11 +23,8 @@ void initializeNamesList() {
 
 void addUserToNamesList(char *usr_n, int usr_s) {
 	
-	NAME newUser;
-	
-	strcpy(newUser.usr_name, usr_n);
-	newUser.usr_socket = usr_s;
-	USERS[nextIndex] = newUser;
+	strcpy(USERS[nextIndex].usr_name, usr_n);
+	USERS[nextIndex].usr_socket = usr_s;
 	
 	nextIndex++;
 	

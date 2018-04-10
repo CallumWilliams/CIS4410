@@ -47,6 +47,7 @@ void main(int argc, char *argv[]) {
 			
 			tok = strtok(NULL, " ");
 			printf("REGISTER %s from %d\n", tok, si_other.sin_port);
+			addUserToNamesList(tok, si_other.sin_port);
 			
 		} else {
 			
