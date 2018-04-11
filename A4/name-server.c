@@ -54,13 +54,24 @@ void main(int argc, char *argv[]) {
 			char *sender = strtok(NULL, " ");
 			char *recv = strtok(NULL, " ");
 			char *msg = strtok(NULL, "\0");
-			printf("%s|%s|%s\n", sender, recv, msg);
-			int index = searchForUserWithName(recv);
-			if (index == -1) {
-				printf("User not found %s\n", recv);
-			} else {
+			if (strcmp(recv, "ANY") == 0) {
+				
 				sprintf(buff, "%s: %s", sender, msg);
-				sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &USERS[index].usr_socket, sizeof(USERS[index].usr_socket));
+				strcat(buff, "\0");
+				for (int i = 0; i < nextIndex; i++) {
+					sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &USERS[i].usr_socket, sizeof(USERS[i].usr_socket));
+				}
+				
+			} else {
+				
+				int index = searchForUserWithName(recv);
+				if (index == -1) {
+					printf("User not found %s\n", recv);
+				} else {
+					sprintf(buff, "%s: %s", sender, msg);
+					sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &USERS[index].usr_socket, sizeof(USERS[index].usr_socket));
+				}
+				
 			}
 			
 		} else if (strcmp(tok, "TERM") == 0) {

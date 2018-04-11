@@ -31,3 +31,19 @@ void user2() {
 	terminate("Bob");
 	
 }
+
+void user3() {
+	
+	serv_register("John");
+	serv_send("ANY", "Hi Everyone");
+	terminate("John");
+	
+}
+
+void user4() {
+	
+	serv_register("Tim");
+	receive();
+	terminate("Tim");
+	
+}

@@ -53,10 +53,10 @@ void terminate(char *process_name) {
 	
 }
 
-void serv_send(char *recv, char *msg) {
+void serv_send(char *process_name, char *msg) {
 	
 	sleep(1); //just to be sure receive is running
-	sprintf(buff, "SEND %s %s %s", client_username, recv, msg);
+	sprintf(buff, "SEND %s %s %s", client_username, process_name, msg);
 	sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 	
 }
@@ -65,11 +65,12 @@ int receive() {
 	
 	char msg[512];
 	int ret = recvfrom(sockfd, msg, 512, 0, (struct sockaddr *) &servAddr, &addr_size);
+	msg[strlen(msg)] = '\0';
 	
 	if (ret == -1) {
 		printf("Error receiving\n");
 	} else {
-		printf("Received %s\n", msg);
+		printf("%s\n", msg);
 	}
 	
 	return ret;

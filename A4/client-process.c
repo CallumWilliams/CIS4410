@@ -30,6 +30,12 @@ void main(int argc, char *argv[]) {
 		case 2:
 			user2();
 			break;
+		case 3:
+			user3();
+			break;
+		case 4:
+			user4();
+			break;
 		default:
 			printf("invalid value %d\n", toRun);
 	}
