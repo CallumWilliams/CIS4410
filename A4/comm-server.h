@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 int port;
 int sockfd;
@@ -54,6 +55,7 @@ void terminate(char *process_name) {
 
 void serv_send(char *recv, char *msg) {
 	
+	sleep(1); //just to be sure receive is running
 	sprintf(buff, "SEND %s %s %s", client_username, recv, msg);
 	sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 	

@@ -60,8 +60,7 @@ void main(int argc, char *argv[]) {
 				printf("User not found %s\n", recv);
 			} else {
 				sprintf(buff, "%s: %s", sender, msg);
-				printf("Sending |%s| to %s\n", buff, recv);
-				sendto(USERS[index].usr_socket.sin_port, buff, strlen(buff), 0, (struct sockaddr *) &USERS[index].usr_socket, sizeof(USERS[index].usr_socket));
+				sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &USERS[index].usr_socket, sizeof(USERS[index].usr_socket));
 			}
 			
 		} else if (strcmp(tok, "TERM") == 0) {
