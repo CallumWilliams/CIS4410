@@ -39,6 +39,7 @@ void main(int argc, char *argv[]) {
 		
 		char *tok;
 		
+		memset(buff, '\0', 512);
 		recvfrom(sockfd, buff, 512, 0, (struct sockaddr *) &si_other, &addr_size);
 		buff[strlen(buff)-1] = '\0';
 		
@@ -47,7 +48,20 @@ void main(int argc, char *argv[]) {
 			
 			tok = strtok(NULL, " ");
 			printf("REGISTER %s from %d\n", tok, si_other.sin_port);
-			addUserToNamesList(tok, si_other.sin_port);
+			addUserToNamesList(tok, si_other);
+			
+		} else if (strcmp(tok, "SEND") == 0) {
+			
+			char *send = strtok(NULL, " ");
+			char *msg = strtok(NULL, "\0");
+			printf("Sending %s to %s\n", msg, send);
+			
+			
+		} else if (strcmp(tok, "TERM") == 0) {
+			
+			tok = strtok(NULL, " ");
+			printf("Terminating %s from %d\n", tok, si_other.sin_port);
+			removeUserFromNamesList(tok);
 			
 		} else {
 			

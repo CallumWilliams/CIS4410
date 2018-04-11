@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <netinet/in.h>
 
 typedef struct _name {
 	
 	char *usr_name;
-	int usr_socket;
+	struct sockaddr_in usr_socket;
 	
 } NAME;
 
@@ -21,7 +22,7 @@ void initializeNamesList() {
 	
 }
 
-void addUserToNamesList(char *usr_n, int usr_s) {
+void addUserToNamesList(char *usr_n, struct sockaddr_in usr_s) {
 	
 	strcpy(USERS[nextIndex].usr_name, usr_n);
 	USERS[nextIndex].usr_socket = usr_s;

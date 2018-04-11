@@ -1,8 +1,5 @@
 #include <stdio.h>
 
-char client_username[50];
-int REGISTERED_FLAG = 0;
-
 void displayUI() {
 	
 	printf("What would you like to do?\n");
