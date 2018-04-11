@@ -41,7 +41,6 @@ void main(int argc, char *argv[]) {
 		
 		memset(buff, '\0', 512);
 		recvfrom(sockfd, buff, 512, 0, (struct sockaddr *) &si_other, &addr_size);
-		buff[strlen(buff)-1] = '\0';
 		
 		tok = strtok(buff, " ");
 		if (strcmp(tok, "REGISTER") == 0) {
@@ -52,10 +51,18 @@ void main(int argc, char *argv[]) {
 			
 		} else if (strcmp(tok, "SEND") == 0) {
 			
-			char *send = strtok(NULL, " ");
+			char *sender = strtok(NULL, " ");
+			char *recv = strtok(NULL, " ");
 			char *msg = strtok(NULL, "\0");
-			printf("Sending %s to %s\n", msg, send);
-			
+			printf("%s|%s|%s\n", sender, recv, msg);
+			int index = searchForUserWithName(recv);
+			if (index == -1) {
+				printf("User not found %s\n", recv);
+			} else {
+				sprintf(buff, "%s: %s", sender, msg);
+				printf("Sending |%s| to %s\n", buff, recv);
+				sendto(USERS[index].usr_socket.sin_port, buff, strlen(buff), 0, (struct sockaddr *) &USERS[index].usr_socket, sizeof(USERS[index].usr_socket));
+			}
 			
 		} else if (strcmp(tok, "TERM") == 0) {
 			

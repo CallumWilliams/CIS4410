@@ -30,7 +30,7 @@ void initializeNetwork(int p) {
 
 void serv_register(char *process_name) {
 	
-	REGISTERED_FLAG = 1;
+	memset(client_username, '\0', 50);
 	strcpy(client_username, process_name);
 	sprintf(buff, "REGISTER %s", process_name);
 	sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
@@ -52,16 +52,25 @@ void terminate(char *process_name) {
 	
 }
 
-void serv_send(char *process_name, char *msg) {
+void serv_send(char *recv, char *msg) {
 	
-	sprintf(buff, "SEND %s %s", process_name, msg);
+	sprintf(buff, "SEND %s %s %s", client_username, recv, msg);
 	sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 	
 }
 
-int receive(char *msg) {
+int receive() {
 	
-	return recvfrom(sockfd, msg, 512, 0, (struct sockaddr *) &servAddr, &addr_size);
+	char msg[512];
+	int ret = recvfrom(sockfd, msg, 512, 0, (struct sockaddr *) &servAddr, &addr_size);
+	
+	if (ret == -1) {
+		printf("Error receiving\n");
+	} else {
+		printf("Received %s\n", msg);
+	}
+	
+	return ret;
 	
 }
 
